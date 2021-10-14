@@ -9,9 +9,14 @@ def check_victory(grid):
 			return grid[0, i]
 	if grid[0, 0] == grid[1, 1] == grid[2, 2] or grid[0, 2] == grid[1, 1] == grid[2, 0]:
 		return grid[1, 1]
-	#if grid[0, 2] == grid[1, 1] == grid[2, 0]:
-	#	return grid[1, 1]
 	return 0
+
+
+def check_valid(grid, case):
+	if grid[(case - 1) // 3, (case - 1) % 3] == 0:
+		return True
+	else:
+		return False
 
 
 def main():
@@ -23,16 +28,18 @@ def main():
 
 	# Main lööps
 	while game:
-		print(grid)
-		case = int(input(f"Player {1 if turn == 1 else 2}: "))
-		grid[(case-1)//3, (case-1)%3] = turn
+		while True:
+			case = int(input(f"Player {1 if turn == 1 else 2}: "))
+			if check_valid(grid, case):
+				break
+		grid[(case-1)//3, case%3-1] = turn
 		v = check_victory(grid)
 		if v != 0:
 			game = False
 		turn *= -1
+		print(grid)
 	print(v)
 
-# Some wizard shit I don't understand. Must question the grand-sorcerer cat-lord dude Thursday
-# I'm guessing it runs the script if the code is the main. But just like... SYNTAX???
+
 if __name__ == '__main__':
 	main()
