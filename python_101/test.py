@@ -20,13 +20,14 @@ def check_valid(grid, case):
 
 
 def main():
-	# Initialisation de Pn à n=0
+	# Initialisation
 	grid = np.zeros((3, 3), dtype=int)
 	turn = 1
 	v = 0
 	game = True
+	print(grid)
 
-	# Main lööps
+	# Main loop
 	while game:
 		while True:
 			case = int(input(f"Player {1 if turn == 1 else 2}: "))
