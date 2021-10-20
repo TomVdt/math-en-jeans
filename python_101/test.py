@@ -37,9 +37,21 @@ def main():
 	while game:
 		# Wait for user to input a valid move
 		while True:
-			case = int(input(f"Player {1 if turn == 1 else 2}'s turn: "))
-			if check_valid_move(grid, case):
-				break
+			case = 0
+			try:
+				case = int(input(f"Player {1 if turn == 1 else 2}'s turn: "))
+			except ValueError:
+				print("dumbass this ain't no integer")
+			if 1 <= case <= 9:
+				if check_valid_move(grid, case):
+					break
+			elif case == 69 or case == 42 or case == 420:
+				print("not funny, didn't laugh")
+			elif case <= 0:
+				print("be positive")
+			else:
+				print("fucking big numbers")
+
 
 		# Place the player's piece on the selected place
 		grid[(case - 1) // 3, (case - 1) % 3] = turn
