@@ -1,5 +1,5 @@
 import numpy as np
-
+print("Hello, za Warudo!")
 
 def check_victory(grid):
 	for i in range(3):
