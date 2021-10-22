@@ -1,5 +1,6 @@
 import numpy as np
-print("Hello, za Warudo!")
+print("Hello, World!")
+
 
 def check_victory(grid):
 	for i in range(3):
@@ -43,7 +44,9 @@ def main():
 			except ValueError:
 				print("dumbass this ain't no integer")
 			if 1 <= case <= 9:
-				if check_valid_move(grid, case):
+				if not check_valid_move(grid, case):
+					print("go find yo own cell you clingy mf")
+				else:
 					break
 			elif case == 69 or case == 42 or case == 420:
 				print("not funny, didn't laugh")
@@ -51,7 +54,6 @@ def main():
 				print("be positive")
 			else:
 				print("fucking big numbers")
-
 
 		# Place the player's piece on the selected place
 		grid[(case - 1) // 3, (case - 1) % 3] = turn
