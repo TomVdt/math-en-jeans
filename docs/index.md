@@ -10,6 +10,6 @@ Vous pourrez lire ici nos traces de recherche pour l'atelier [MATh.en.JEANS](htt
 
 Parmi les propositions, nous avons choisi de chercher et explorer des solutions pour les jeux du Morpion, Atchi et Picaria.
 
-[Pour commencer, nous allons explorer le Morpion](/morpion)
+[Pour commencer, nous allons explorer le Morpion](morpion)
 
 
