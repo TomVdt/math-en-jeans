@@ -1,5 +1,5 @@
 
 options = {
 	'width': 600,
-	'height': 700,
+	'height': 600,
 }

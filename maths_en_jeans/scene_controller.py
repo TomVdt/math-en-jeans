@@ -5,7 +5,7 @@ import glooey
 from maths_en_jeans.options import options
 from maths_en_jeans.scenes.main_menu import MainMenu
 from maths_en_jeans.scenes.tictactoe import TicTacToe
-from maths_en_jeans.scenes.hatchi import Hatchi
+from maths_en_jeans.scenes.achi import Achi
 from maths_en_jeans.scenes.picaria import Picaria
 
 
@@ -33,7 +33,7 @@ class SceneController(pyglet.window.Window):
 		self.scenes = {
 			'menu': MainMenu(self, self.gui),
 			'tictactoe': TicTacToe(self, self.gui),
-			'hatchi': Hatchi(self, self.gui),
+			'achi': Achi(self, self.gui),
 			'picaria': Picaria(self, self.gui),
 		}
 

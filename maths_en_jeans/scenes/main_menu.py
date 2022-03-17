@@ -23,7 +23,7 @@ class MainMenu(Scene):
 		self.button_container = glooey.VBox()
 
 		self.tictactoe_button = Button('Tic-Tac-Toe', callback=self.to_tictactoe)
-		self.hatchi_button = Button('Hatchi', callback=self.to_hatchi)
+		self.hatchi_button = Button('Achi', callback=self.to_achi)
 		self.picaria_button = Button('Picaria', callback=self.to_picaria)
 		self.exit_button = Button('Exit', callback=exit)
 
@@ -37,8 +37,8 @@ class MainMenu(Scene):
 	def to_tictactoe(self):
 		self.window.switch_to_scene('tictactoe')
 
-	def to_hatchi(self):
-		self.window.switch_to_scene('hatchi')
+	def to_achi(self):
+		self.window.switch_to_scene('achi')
 
 	def to_picaria(self):
 		self.window.switch_to_scene('picaria')
