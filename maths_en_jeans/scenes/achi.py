@@ -8,8 +8,8 @@ from maths_en_jeans.ui import *
 
 
 RULES = """How to play:
-- Each person gets 4 pieces
-- Every person takes turns to place 1 of their pieces
+- Each player gets 4 pieces
+- Every player takes turns to place 1 of their pieces
 - Once all pieces are placed, you may only move pieces according to the lines
 - If someone aligns 3 pieces, they win!"""
 
@@ -163,7 +163,6 @@ class Achi(Scene):
 
 	def end(self):
 		self.reset_game()
-		self.game_over = True
 		self.gui.clear()
 
 	def on_user_interaction(self, index):
@@ -187,8 +186,8 @@ class Achi(Scene):
 	def show_info(self):
 		self.info.open(self.gui)
 
-	def update(self):
-		if not self.state.game_over():
+	def run(self, dt):
+		if not self.game_over:
 			if self.current_player.ready:
 				move = self.current_player.get_next_move(self.state)
 				self.state.play(self.current_player.piece, move)
@@ -196,20 +195,17 @@ class Achi(Scene):
 
 				self.current_player_index = (self.current_player_index + 1) % 2
 				self.current_player = self.players[self.current_player_index]
-		else:
-			self.game_over = True
-			winner = self.state.has_won()
-			if winner == Piece.PLAYER1:
-				msg = 'Player 1 (o) has won!'
-			elif winner == Piece.PLAYER2:
-				msg = 'Player 2 (x) has won!'
-			else:
-				msg = 'No one won.'
-			self.on_game_over(msg)
 
-	def run(self, dt):
-		if not self.game_over:
-			self.update()
+				self.game_over = self.state.game_over()
+				if self.game_over:
+					winner = self.state.has_won()
+					if winner == Piece.PLAYER1:
+						msg = 'Player 1 (o) has won!'
+					elif winner == Piece.PLAYER2:
+						msg = 'Player 2 (x) has won!'
+					else:
+						msg = 'No one won.'
+					self.on_game_over(msg)
 
 	def draw(self):
 		self.gui.batch.draw()

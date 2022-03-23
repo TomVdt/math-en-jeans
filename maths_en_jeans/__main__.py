@@ -11,7 +11,10 @@ def main():
 	window = SceneController(caption='Maths-en-Jeans', resizable=True)
 	pyglet.clock.schedule_interval(window.update, window.frame_rate)
 
-	pyglet.app.run()
+	try:
+		pyglet.app.run()
+	except KeyboardInterrupt:
+		print('\nExited ungracefully. Goodbye.')
 
 
 if __name__ == '__main__':

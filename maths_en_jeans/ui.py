@@ -17,6 +17,14 @@ def keep_square(widget, widget_rect, max_rect):
 	widget_rect.center = max_rect.center
 
 
+def clamp_600(widget, widget_rect, max_rect):
+	if max_rect.width * 0.8 > 600:
+		widget_rect.width = 600
+	else:
+		widget_rect.width = max_rect.width * 0.8
+	widget_rect.center = max_rect.center
+
+
 class Label(glooey.Label):
 	custom_color = '#ffffff'
 	custom_alignment = 'center'
@@ -119,6 +127,7 @@ class Menu(glooey.HBox):
 
 class Info(glooey.ButtonDialog):
 	custom_autoadd_content = True
+	custom_alignment = clamp_600
 	Content = Label
 	OkButton = Button
 

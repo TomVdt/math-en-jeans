@@ -30,10 +30,8 @@ class GameGrid(glooey.Grid):
 		self.populate()
 
 	def update(self, last_move, player):
-		index, = last_move
+		index = last_move
 		self[index // 3, index % 3].foreground = glooey.Image(image=self.PLAYER1_IMAGE if player == Piece.PLAYER1 else self.PLAYER2_IMAGE)
-		# Avoid having to check validity by "disabling" button
-		self[index // 3, index % 3].callback = None
 
 	def populate(self):
 		for i in range(3):
@@ -44,7 +42,6 @@ class GameGrid(glooey.Grid):
 	def reset(self):
 		for child in self._children:
 			self[child].foreground = PieceButton.Foreground()
-			self[child].callback = self.callback
 
 
 class TicTacToe(Scene):
@@ -152,19 +149,19 @@ class TicTacToe(Scene):
 
 	def end(self):
 		self.reset_game()
-		self.game_over = True
 		self.gui.clear()
 
 	def on_user_interaction(self, index):
 		if self.game_over:
 			self.start_game()
-		self.current_player.set_move((index,))
+		if self.state.is_valid_move(index, self.current_player.piece):
+			self.current_player.set_move(index)
 
 	def on_game_over(self, msg):
 		self.header.foreground.text = msg
 
-	def update(self):
-		if not self.state.game_over():
+	def run(self, dt):
+		if not self.game_over:
 			if self.current_player.ready:
 				move = self.current_player.get_next_move(self.state)
 				self.state.play(self.current_player.piece, move)
@@ -172,20 +169,17 @@ class TicTacToe(Scene):
 
 				self.current_player_index = (self.current_player_index + 1) % 2
 				self.current_player = self.players[self.current_player_index]
-		else:
-			self.game_over = True
-			winner = self.state.has_won()
-			if winner == Piece.PLAYER1:
-				msg = 'Player 1 (o) has won!'
-			elif winner == Piece.PLAYER2:
-				msg = 'Player 2 (x) has won!'
-			else:
-				msg = 'No one won.'
-			self.on_game_over(msg)
 
-	def run(self, dt):
-		if not self.game_over:
-			self.update()
+				self.game_over = self.state.game_over()
+				if self.game_over:
+					winner = self.state.has_won()
+					if winner == Piece.PLAYER1:
+						msg = 'Player 1 (o) has won!'
+					elif winner == Piece.PLAYER2:
+						msg = 'Player 2 (x) has won!'
+					else:
+						msg = 'No one won.'
+					self.on_game_over(msg)
 
 	def draw(self):
 		self.gui.batch.draw()

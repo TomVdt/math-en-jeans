@@ -8,6 +8,7 @@ inf = float('inf')
 
 
 class Player:
+	BOT = True
 
 	def __init__(self, piece, opponent):
 		self.piece = piece
@@ -22,6 +23,7 @@ class Player:
 
 
 class HumanPlayer(Player):
+	BOT = False
 
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
@@ -37,6 +39,9 @@ class HumanPlayer(Player):
 		return self.move
 
 
+# To implement your own bot, simply modify this
+# Make sure to add it to the __all__ and to the player selection settings
+# gl with this documentation lmao
 class CustomPlayer(Player):
 
 	def get_next_move(self, state):
@@ -50,7 +55,7 @@ class RandomPlayer(Player):
 
 
 class MinimaxPlayer(Player):
-	SEARCH_DEPTH = 10
+	SEARCH_DEPTH = 9
 
 	def get_score(self, state, depth):
 		winner = state.has_won()
