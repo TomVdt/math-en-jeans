@@ -1,6 +1,10 @@
-__all__ = ['HumanPlayer', 'RandomPlayer', 'MinimaxPlayer', 'SthPlayer']
+__all__ = ['HumanPlayer', 'RandomPlayer', 'MinimaxPlayer']
 
 import random
+
+
+# Avoid importing math.inf ¯\_(ツ)_/¯
+inf = float('inf')
 
 
 class Player:
@@ -10,7 +14,7 @@ class Player:
 		self.opponent = opponent
 		self.ready = True
 
-	def on_user_interaction(self, row, col):
+	def set_move(self, move):
 		return
 
 	def get_next_move(self, state):
@@ -24,8 +28,8 @@ class HumanPlayer(Player):
 		self.ready = False
 		self.move = None
 
-	def on_user_interaction(self, row, col):
-		self.move = (row, col)
+	def set_move(self, move):
+		self.move = move
 		self.ready = True
 
 	def get_next_move(self, state):
@@ -33,64 +37,66 @@ class HumanPlayer(Player):
 		return self.move
 
 
-class RandomPlayer(Player):
-
-	def get_next_move(self, state):
-		return random.choice(state.get_available_moves())
-
-
-class SthPlayer(Player):
+class CustomPlayer(Player):
 
 	def get_next_move(self, state):
 		return ...
 
 
+class RandomPlayer(Player):
+
+	def get_next_move(self, state):
+		return random.choice(state.get_available_moves(self.piece))
+
+
 class MinimaxPlayer(Player):
-	SEARCH_DEPTH = 9
+	SEARCH_DEPTH = 10
 
 	def get_score(self, state, depth):
 		winner = state.has_won()
 		if winner == self.piece:
-			score = 10000 + depth
+			return 1000 + depth
 		elif winner == self.opponent:
-			score = -10000 + depth
+			return -1000 - depth
 		else:
-			score = 0
 			# Score for the position of the pieces
-			pass
-		return score
+			# Depends on the game, so we leave the
+			# implementation inside the game logic
+			return state.get_score()
 
 	def minimax(self, state, maximizer, depth):
-		moves = state.get_available_moves()
+		moves = state.get_available_moves(self.piece if maximizer else self.opponent)
 		if depth == 0 or state.game_over():
 			return self.get_score(state, depth)
 		if maximizer:
-			max_score = -999999999
+			score = -inf
 			for move in moves:
-				state.play(self.piece, *move)
-				score = self.minimax(state, False, depth - 1)
-				state.unplay(*move)
-				max_score = max(score, max_score)
-			return max_score
+				state.play(self.piece, move)
+				score = max(self.minimax(state, False, depth - 1), score)
+				state.unplay(move)
 		else:
-			min_score = 999999999
+			score = inf
 			for move in moves:
-				state.play(self.opponent, *move)
-				score = self.minimax(state, True, depth - 1)
-				state.unplay(*move)
-				min_score = min(score, min_score)
-			return min_score
+				state.play(self.opponent, move)
+				score = min(self.minimax(state, True, depth - 1), score)
+				state.unplay(move)
+		return score
 
 	def get_next_move(self, state):
-		moves = state.get_available_moves()
+		moves = state.get_available_moves(self.piece)
 
-		max_score = -999999999
+		# Emulate 1 round of minimax to save the best move
+		max_score = -inf
 		best_move = moves[0]
 		for i, move in enumerate(moves):
-			state.play(self.piece, *move)
+			state.play(self.piece, move)
 			score = self.minimax(state, False, self.SEARCH_DEPTH)
-			state.unplay(*move)
+			state.unplay(move)
 			if score > max_score:
 				max_score = score
-				best_move = move
-		return best_move
+				best_move = [move]
+			elif score == max_score:
+				# Save all moves with the same score
+				best_move.append(move)
+		# Chose 1 move from all of the best moves (more fun!)
+		return random.choice(best_move)

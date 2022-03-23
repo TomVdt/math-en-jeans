@@ -1,4 +1,4 @@
-__all__ = ['Label', 'Header', 'Button', 'Cycle', 'Menu', 'Background', 'GameContainer', 'Color', 'expand_if_close', 'keep_square']
+__all__ = ['Label', 'Header', 'Info', 'Button', 'Cycle', 'Menu', 'Background', 'GameContainer', 'Color', 'expand_if_close', 'keep_square']
 
 import glooey
 
@@ -117,6 +117,29 @@ class Menu(glooey.HBox):
 	custom_alignment = 'fill'
 
 
+class Info(glooey.ButtonDialog):
+	custom_autoadd_content = True
+	Content = Label
+	OkButton = Button
+
+	class Buttons(glooey.HBox):
+		custom_alignment = 'right'
+		custom_padding = 8
+
+	class Decoration(glooey.Background):
+		custom_color = '#819ca9'
+		custom_outline = '#29434e'
+
+	def __init__(self, text):
+		super().__init__(text=text, line_wrap=400)
+		self.ok_button = self.OkButton(text='OK')
+		self.ok_button.push_handlers(on_click=self.on_click_ok)
+		self.buttons.pack(self.ok_button)
+
+	def on_click_ok(self, widget):
+		self.close()
+
+
 class GameContainer(glooey.Stack):
 	# custom_padding = 8
 	pass
@@ -150,7 +173,7 @@ if __name__ == '__main__':
 	gui_batch = pyglet.graphics.Batch()
 	gui = glooey.Gui(win, batch=gui_batch)
 
-	magik = Game()
+	magik = GameContainer()
 	container = glooey.VBox()
 	buttons = glooey.HBox()
 
@@ -164,11 +187,13 @@ if __name__ == '__main__':
 	buttons.add(button)
 	buttons.add(cycle)
 
+	overlay = Info('text here plz')
+
 	bg = Background()
 	menu = Menu()
 	bg.add(menu)
 	lab1 = Label('number 1')
-	but1 = Button('issou', callback=lambda: print('uwu'))
+	but1 = Button('issou', callback=lambda: overlay.open(gui))
 	cycl = Cycle(['1', '2', '3', 'viva l\'algérie'])
 	menu.pack(lab1)
 	menu.pack(but1)
