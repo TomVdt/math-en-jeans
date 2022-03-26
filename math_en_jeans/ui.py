@@ -1,5 +1,6 @@
-__all__ = ['Label', 'Header', 'Info', 'Button', 'Cycle', 'Menu', 'Background', 'GameContainer', 'Color', 'expand_if_close', 'keep_square']
+__all__ = ['Label', 'Title', 'Header', 'Url', 'Info', 'Button', 'Cycle', 'Menu', 'Card', 'Background', 'Image', 'PaddedGrid', 'GameContainer', 'Color', 'expand_if_close', 'keep_square']
 
+import webbrowser
 import glooey
 
 
@@ -25,6 +26,25 @@ def clamp_600(widget, widget_rect, max_rect):
 	widget_rect.center = max_rect.center
 
 
+class Color(glooey.Background):
+
+	def __init__(self, color, **kwargs):
+		super().__init__(color=color, **kwargs)
+
+
+class Background(glooey.Stack):
+	custom_alignment = 'fill'
+
+	def __init__(self, *args, color=None, **kwargs):
+		super().__init__(*args, **kwargs)
+		self.color = Color(color=color or '#29434e')
+		self.add_back(self.color)
+
+
+class Image(glooey.Image):
+	custom_padding = 8
+
+
 class Label(glooey.Label):
 	custom_color = '#ffffff'
 	custom_alignment = 'center'
@@ -32,14 +52,16 @@ class Label(glooey.Label):
 	custom_padding = 8
 
 
-class Header(glooey.Stack):
+class Title(glooey.Label):
+	custom_color = '#ffffff'
+	custom_alignment = 'center'
+	custom_font_size = 24
+	custom_padding = 16
+	custom_underline = True
 
-	class Foreground(glooey.Label):
-		custom_color = '#ffffff'
-		custom_alignment = 'center'
-		custom_font_size = 24
-		custom_padding = 16
-		custom_underline = True
+
+class Header(glooey.Stack):
+	Foreground = Title
 
 	class Background(glooey.Background):
 		custom_color = '#29434e'
@@ -52,9 +74,27 @@ class Header(glooey.Stack):
 		self.add(self.foreground)
 
 
+class Url(glooey.Button):
+	Foreground = Label
+	custom_alignment = 'fill'
+
+	def __init__(self, text, link):
+		super().__init__(text=text, color='#58a6ff')
+		self.link = link
+
+	def on_click(self, widget):
+		webbrowser.open(self.link)
+
+	def on_mouse_enter(self, x, y):
+		self.foreground.color = '#5094cc'
+
+	def on_mouse_leave(self, x, y):
+		self.foreground.color = '#58a6ff'
+
+
 class Button(glooey.Button):
 	Foreground = Label
-	custom_alignment = 'center'
+	custom_alignment = 'fill'
 
 	class Base(glooey.Background):
 		custom_color = '#29434e'
@@ -80,7 +120,7 @@ class Button(glooey.Button):
 
 class Cycle(glooey.Button):
 	Foreground = Label
-	custom_alignment = 'center'
+	custom_alignment = 'fill'
 
 	class Base(glooey.Background):
 		custom_color = '#29434e'
@@ -125,6 +165,41 @@ class Menu(glooey.HBox):
 	custom_alignment = 'fill'
 
 
+class Card(Background):
+	Description = Label
+	Button = Button
+	Image = Image
+
+	def __init__(self, image=None, description=None):
+		super().__init__(color='#546e7a')
+		self.container = glooey.VBox()
+		self._desc = description
+		if image is not None:
+			self.image = self.Image(image, responsive=True)
+			self.container.add(self.image)
+		else:
+			self.image = None
+		if description is not None:
+			self.description = self.Description()
+			self.container.pack(self.description)
+		else:
+			self.description = None
+		self.add_front(self.container)
+
+	def do_regroup_children(self):
+		# Hack to allow dynamically changing linewrap
+		if self.description is not None:
+			self.description.enable_line_wrap(self.rect.width - 20)
+			self.description.text = self._desc
+		super().do_regroup_children()
+
+	def add(self, *args, **kwargs):
+		self.container.add(*args, **kwargs)
+
+	def pack(self, *args, **kwargs):
+		self.container.pack(*args, **kwargs)
+
+
 class Info(glooey.ButtonDialog):
 	custom_autoadd_content = True
 	custom_alignment = clamp_600
@@ -140,7 +215,8 @@ class Info(glooey.ButtonDialog):
 		custom_outline = '#29434e'
 
 	def __init__(self, text):
-		super().__init__(text=text, line_wrap=400)
+		super().__init__()
+		self.text = text
 		self.ok_button = self.OkButton(text='OK')
 		self.ok_button.push_handlers(on_click=self.on_click_ok)
 		self.buttons.pack(self.ok_button)
@@ -148,31 +224,20 @@ class Info(glooey.ButtonDialog):
 	def on_click_ok(self, widget):
 		self.close()
 
+	def do_regroup_children(self):
+		# Hack to allow dynamically changing linewrap
+		if self.content is not None:
+			self.content.enable_line_wrap(self.rect.width - 20)
+			self.content.text = self.text
+		super().do_regroup_children()
+
+
+class PaddedGrid(glooey.Grid):
+	custom_cell_padding = 8
+
 
 class GameContainer(glooey.Stack):
-	# custom_padding = 8
 	pass
-
-
-class Color(glooey.Background):
-
-	def __init__(self, color, **kwargs):
-		super().__init__(color=color, **kwargs)
-
-
-class Background(glooey.Stack):
-	custom_alignment = 'fill'
-
-	class Background(glooey.Background):
-		custom_color = '#29434e'
-
-	def __init__(self, *args, color=None, **kwargs):
-		super().__init__(*args, **kwargs)
-		if color is None:
-			background = self.Background()
-		else:
-			background = self.Background(color=color)
-		self.add_back(background)
 
 
 if __name__ == '__main__':

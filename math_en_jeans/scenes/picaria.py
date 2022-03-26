@@ -1,59 +1,65 @@
 import pyglet
 import glooey
 
-from maths_en_jeans.scenes.scene import Scene
-from maths_en_jeans.grid import AchiGrid, Piece
-from maths_en_jeans.players import *
-from maths_en_jeans.ui import *
+from math_en_jeans.scenes.scene import Scene
+from math_en_jeans.grid import PicariaGrid, Piece
+from math_en_jeans.players import *
+from math_en_jeans.ui import *
 
 
 RULES = """How to play:
-- Each player gets 4 pieces
-- Every player takes turns to place 1 of their pieces
+- Each player gets 3 pieces
+- Every player takes turns to place 1 of their pieces, everywhere except the very middle
 - Once all pieces are placed, you may only move pieces according to the lines
-- If someone aligns 3 pieces, they win!"""
+- If someone aligns 3 pieces, they win!
+WARNING: the MiniMax algorithm does not work well with this game due to it's "openess" compared to the other two. Expect slow / unusable performance"""
 
 
 class PieceButton(Button):
 	custom_alignment = 'fill'
-	custom_padding = 8
-
-	class Foreground(glooey.Image):
-		pass
+	Foreground = Image
 
 	def __init__(self, index, callback):
 		super().__init__(callback=callback, callback_args=(index,))
 
 
-class GameGrid(glooey.Grid):
+class GameGrid(PaddedGrid):
 	custom_alignment = keep_square
 	custom_padding = 8
 	PLAYER1_IMAGE = pyglet.resource.image('assets/round.png')
 	PLAYER2_IMAGE = pyglet.resource.image('assets/cross.png')
+	MAPPING = {
+		0: (0, 0), 2: (0, 2), 4: (0, 4),
+		6: (1, 1), 8: (1, 3),
+		10: (2, 0), 12: (2, 2), 14: (2, 4),
+		16: (3, 1), 18: (3, 3),
+		20: (4, 0), 22: (4, 2), 24: (4, 4)
+	}
 
 	def __init__(self, callback):
-		super().__init__(3, 3)
+		super().__init__(5, 5)
 		self.callback = callback
+		self.PLAYER1_IMAGE.width, self.PLAYER1_IMAGE.height = 80, 80
+		self.PLAYER2_IMAGE.width, self.PLAYER2_IMAGE.height = 80, 80
 		self.populate()
 
 	def update(self, last_move, player):
 		move_type, old_index, new_index = last_move
-		self[new_index // 3, new_index % 3].foreground = glooey.Image(image=self.PLAYER1_IMAGE if player == Piece.PLAYER1 else self.PLAYER2_IMAGE)
+		self[self.MAPPING[new_index]].foreground = Image(image=self.PLAYER1_IMAGE if player == Piece.PLAYER1 else self.PLAYER2_IMAGE, responsive=True)
 		if move_type == 'move':
-			self[old_index // 3, old_index % 3].foreground = PieceButton.Foreground()
+			self[self.MAPPING[old_index]].foreground = PieceButton.Foreground()
 
 	def populate(self):
-		for i in range(3):
-			for j in range(3):
-				button = PieceButton(i*3 + j, self.callback)
-				self.add(i, j, button)
+		for i in range(0, 25, 2):
+			button = PieceButton(i, self.callback)
+			self.add(*self.MAPPING[i], button)
 
 	def reset(self):
 		for child in self._children:
 			self[child].foreground = PieceButton.Foreground()
 
 
-class Achi(Scene):
+class Picaria(Scene):
 
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
@@ -78,6 +84,7 @@ class Achi(Scene):
 		self.options_start = None
 
 		# Game logic
+		self.pending_move = None
 		self.player1 = None
 		self.player2 = None
 		self.players = None
@@ -99,7 +106,7 @@ class Achi(Scene):
 
 		self.game_over = False
 
-		self.state = AchiGrid()
+		self.state = PicariaGrid()
 
 	def reset_game(self):
 		self.grid.reset()
@@ -108,14 +115,15 @@ class Achi(Scene):
 		self.player2 = None
 		self.players = None
 		self.game_over = True
-		self.header.foreground.text = 'Achi'
+		self.move_origin = -1
+		self.header.foreground.text = 'Picaria'
 
 	def load(self):
 		# UI stuff
 		self.container = glooey.VBox()
 
 		# Header
-		self.header = Header('Achi')
+		self.header = Header('Picaria')
 
 		# Game
 		self.game_container = GameContainer()
@@ -169,15 +177,21 @@ class Achi(Scene):
 		if self.game_over:
 			self.start_game()
 		# Validate move before continuing
-		destination = self.state.get_free_spaces_adjacent(index)
 		phase = self.state.get_game_phase()
 		if phase == 'tictactoe':
 			move = ('new', 0, index)
 		else:
-			move = ('move', index, destination)
-		valid = self.state.is_valid_move(move, self.current_player.piece)
-		# print(f"{valid=}, {move=}, {index=}")
-		if valid:
+			# Invalid move as placeholder
+			move = ('invalid', -1, -1)
+			if self.move_origin == -1:
+				if not self.state.is_free(index):
+					self.move_origin = index
+			else:
+				if self.state.is_free(index):
+					move = ('move', self.move_origin, index)
+					self.move_origin = -1
+
+		if self.state.is_valid_move(move, self.current_player.piece):
 			self.current_player.set_move(move)
 
 	def on_game_over(self, msg):

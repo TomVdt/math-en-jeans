@@ -3,12 +3,12 @@
 def main():
 	import os
 	import pyglet
-	from maths_en_jeans.scene_controller import SceneController
+	from math_en_jeans.scene_controller import SceneController
 
-	pyglet.resource.path = [os.getcwd() + '/maths_en_jeans']
+	pyglet.resource.path = [os.getcwd() + '/math_en_jeans']
 	pyglet.resource.reindex()
 
-	window = SceneController(caption='Maths-en-Jeans', resizable=True)
+	window = SceneController(caption='Math-en-Jeans', resizable=True)
 	pyglet.clock.schedule_interval(window.update, window.frame_rate)
 
 	try:

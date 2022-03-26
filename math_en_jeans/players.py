@@ -55,7 +55,7 @@ class RandomPlayer(Player):
 
 
 class MinimaxPlayer(Player):
-	SEARCH_DEPTH = 9
+	SEARCH_DEPTH = 6
 
 	def get_score(self, state, depth):
 		winner = state.has_won()

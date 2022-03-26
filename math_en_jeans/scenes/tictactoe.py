@@ -1,24 +1,21 @@
 import pyglet
 import glooey
 
-from maths_en_jeans.scenes.scene import Scene
-from maths_en_jeans.grid import TicTacToeGrid, Piece
-from maths_en_jeans.players import *
-from maths_en_jeans.ui import *
+from math_en_jeans.scenes.scene import Scene
+from math_en_jeans.grid import TicTacToeGrid, Piece
+from math_en_jeans.players import *
+from math_en_jeans.ui import *
 
 
 class PieceButton(Button):
 	custom_alignment = 'fill'
-	custom_padding = 8
-
-	class Foreground(glooey.Image):
-		pass
+	Foreground = Image
 
 	def __init__(self, index, callback):
 		super().__init__(callback=callback, callback_args=(index,))
 
 
-class GameGrid(glooey.Grid):
+class GameGrid(PaddedGrid):
 	custom_alignment = keep_square
 	custom_padding = 8
 	PLAYER1_IMAGE = pyglet.resource.image('assets/round.png')
@@ -31,7 +28,7 @@ class GameGrid(glooey.Grid):
 
 	def update(self, last_move, player):
 		index = last_move
-		self[index // 3, index % 3].foreground = glooey.Image(image=self.PLAYER1_IMAGE if player == Piece.PLAYER1 else self.PLAYER2_IMAGE)
+		self[index // 3, index % 3].foreground = Image(image=self.PLAYER1_IMAGE if player == Piece.PLAYER1 else self.PLAYER2_IMAGE, responsive=True)
 
 	def populate(self):
 		for i in range(3):

@@ -2,11 +2,11 @@ import pyglet
 from pyglet.window import key
 import glooey
 
-from maths_en_jeans.options import options
-from maths_en_jeans.scenes.main_menu import MainMenu
-from maths_en_jeans.scenes.tictactoe import TicTacToe
-from maths_en_jeans.scenes.achi import Achi
-from maths_en_jeans.scenes.picaria import Picaria
+from math_en_jeans.options import options
+from math_en_jeans.scenes.main_menu import MainMenu
+from math_en_jeans.scenes.tictactoe import TicTacToe
+from math_en_jeans.scenes.achi import Achi
+from math_en_jeans.scenes.picaria import Picaria
 
 
 class SceneController(pyglet.window.Window):

@@ -1,3 +1,3 @@
-# maths-en-jeans
+# math-en-jeans
 
-Projet Maths-en-Jeans
+Projet Math-en-Jeans

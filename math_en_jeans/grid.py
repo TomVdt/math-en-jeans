@@ -19,6 +19,9 @@ class Grid:
 	def __iter__(self):
 		return iter(self.state)
 
+	def __hash__(self):
+		return hash(tuple(self.state))
+
 	def reset(self):
 		self.state = self.reset_state
 
@@ -261,10 +264,10 @@ class PicariaGrid(AchiGrid):
 			if self.state[i*2] == self.state[i*2 + 10] == self.state[i*2 + 20] != self.EMPTY:
 				return self.state[i*2]
 		# Top-left diagonal
-		if self.state[0] == self.state[12] == self.state[24] != self.EMPTY and self.state[6] == self.state[18] == self.EMPTY:
+		if self.state[6] == self.state[12] == self.state[18]:
 			return self.state[0]
 		# Bottom-left diagonal
-		if self.state[20] == self.state[12] == self.state[4] != self.EMPTY and self.state[16] == self.state[8] == self.EMPTY:
+		if self.state[16] == self.state[12] == self.state[8] != self.EMPTY:
 			return self.state[6]
 		# Check small squares (ugly but works)
 		if self.state[0] == self.state[6] == self.state[12] != self.EMPTY:
@@ -316,7 +319,6 @@ class PicariaGrid(AchiGrid):
 		# Phase 2 (moving phase)
 		else:
 			# Find empty space
-			# TODO: find all movable pieces and their adjacent free spaces
 			moves = []
 			for i, piece in enumerate(self.state):
 				if piece == player:
